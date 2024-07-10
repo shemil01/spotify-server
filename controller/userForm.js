@@ -5,6 +5,8 @@ const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
+const twilio = require("twilio");
+const Otp = require("../model/Otp");
 //joi validation for user
 
 const userValidation = (data, regType) => {
@@ -47,8 +49,6 @@ const userValidation = (data, regType) => {
               "string.empty": "Gender is required",
             }),
   });
-
-  
 };
 
 //user registration
@@ -57,21 +57,9 @@ const userRegiser = async (req, res) => {
   const { username, email, password, dateOfBirth, gender } = req.body;
   console.log(req.body);
 
-  // const validate = await userValidation.validate({
-  //   username,
-  //   email,
-  //   password,
-  //   dateOfBirth,
-  //   gender,
-  // });
-
-  // if (!validate) {
-  //   res.status(400).send("Validation error");
-  // }
-
   if (!(username && email && password && dateOfBirth && gender)) {
     res.status(400).json({
-      message: "Please fill all field",    
+      message: "Please fill all field",
     });
   }
   const userExist = await userSchema.findOne({ email });
@@ -101,8 +89,8 @@ const userRegiser = async (req, res) => {
   user.password = undefined;
   res.status(200).json({
     success: true,
-    message: "Account created successfully",  
-  });    
+    message: "Account created successfully",
+  });
 };
 
 //User  Login
@@ -141,23 +129,25 @@ const userLogin = async (req, res) => {
     message: "Login successfull",
   });
 };
+
 //google
 
 const googleLogin = async (req, res) => {
   const { token } = req.body;
-  console.log(token);
+
   const response = await fetch(
     `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${token}`
   );
   const googleData = await response.json();
-  console.log(googleData);
-  const { email, name } = googleData;
+
+  const { email, name, picture } = googleData;
   let user = await userSchema.findOne({ email });
   if (!user) {
     user = new userSchema({
       username: name,
       email,
       loginMethod: "Google",
+      profilePicture: picture,
     });
     await user.save();
   }
@@ -219,14 +209,20 @@ const passwordSave = async (req, res) => {
     resetPasswordToken: token,
     resetPasswordExpires: { $gt: Date.now() },
   });
-  if(!user){
-    res.status(400).send("Password reset token is invalid ")
+  if (!user) {
+    res.status(400).send("Password reset token is invalid ");
   }
   user.password = bcrypt.hashSync(password, 10);
-        user.resetPasswordToken = undefined;
-        user.resetPasswordExpires = undefined;
-        await user.save();
-        res.status(200).send("Password has been reset")
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpires = undefined;
+  await user.save();
+  res.status(200).send("Password has been reset");
 };
 
-module.exports = { userRegiser, userLogin, googleLogin,forgotPassword,passwordSave };
+module.exports = {
+  userRegiser,
+  userLogin,
+  googleLogin,
+  forgotPassword,
+  passwordSave,
+};
