@@ -1,4 +1,3 @@
-
 const { required } = require("joi");
 const mongoose = require("mongoose");
 
@@ -49,19 +48,18 @@ const userSchema = new mongoose.Schema(
     profilePicture: String,
     dateOfBirth: {
       type: Date,
-      day:required,
-      year:required,
-      month:required,
+      day: required,
+      year: required,
+      month: required,
       required: function () {
-        return this.loginMethod !== "Google"
-        
-      }
+        return this.loginMethod !== "Google";
+      },
     },
     gender: {
       type: String,
       enum: ["Male", "Female", "Non-Binary", "Other"],
       required: function () {
-       return this.loginMethod !== "Google"
+        return this.loginMethod !== "Google";
       },
     },
   },

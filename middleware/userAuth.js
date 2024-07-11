@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 const {tryCatch} = require('../utils/tryCatch')
-const userSchema = require("../model/UserSchema")
+const userSchema = require('../model/User')
 
 const userAuth = tryCatch(async(req,res,next)=>{
     const {token} = req.cookies

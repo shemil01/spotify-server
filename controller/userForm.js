@@ -1,12 +1,11 @@
-const userSchema = require("../model/UserSchema");
+const UserSchema = require("../model/User");
 const bcrypt = require("bcryptjs");
 const joi = require("joi");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
-const twilio = require("twilio");
-const Otp = require("../model/Otp");
+
 //joi validation for user
 
 const userValidation = (data, regType) => {
@@ -62,7 +61,7 @@ const userRegiser = async (req, res) => {
       message: "Please fill all field",
     });
   }
-  const userExist = await userSchema.findOne({ email });
+  const userExist = await UserSchema.findOne({ email });
 
   if (userExist) {
     res.status(401).send("User already exist ");
@@ -71,7 +70,7 @@ const userRegiser = async (req, res) => {
   //password bcrypt
   const hashPassword = await bcrypt.hash(String(password), 10);
 
-  const user = await userSchema.create({
+  const user = await UserSchema.create({
     username,
     email,
     password: hashPassword,
@@ -101,7 +100,7 @@ const userLogin = async (req, res) => {
     res.status(400).send("Please fill all fields");
   }
 
-  const userData = await userSchema.findOne({
+  const userData = await UserSchema.findOne({
     $or: [{ email: email }, { username: username }],
   });
   if (!userData) {
@@ -139,11 +138,11 @@ const googleLogin = async (req, res) => {
     `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${token}`
   );
   const googleData = await response.json();
-
   const { email, name, picture } = googleData;
-  let user = await userSchema.findOne({ email });
+  let user = await UserSchema.findOne({ email });
+  console.log(user);
   if (!user) {
-    user = new userSchema({
+    user = new UserSchema({
       username: name,
       email,
       loginMethod: "Google",
@@ -168,7 +167,7 @@ const googleLogin = async (req, res) => {
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
 
-  const user = await userSchema.findOne({ email });
+  const user = await UserSchema.findOne({ email });
 
   if (!user) {
     res.status(404).send("user not exist");
@@ -205,7 +204,7 @@ const passwordSave = async (req, res) => {
   const { token } = req.params;
   const { password } = req.body;
 
-  const user = await userSchema.findOne({
+  const user = await UserSchema.findOne({
     resetPasswordToken: token,
     resetPasswordExpires: { $gt: Date.now() },
   });
@@ -218,6 +217,12 @@ const passwordSave = async (req, res) => {
   await user.save();
   res.status(200).send("Password has been reset");
 };
+
+// user view profail
+
+const viewProfail = async(req,res)=>{
+  
+}
 
 module.exports = {
   userRegiser,
