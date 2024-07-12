@@ -1,54 +1,12 @@
 const UserSchema = require("../model/User");
 const bcrypt = require("bcryptjs");
-const joi = require("joi");
+// const joi = require("joi");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 
-//joi validation for user
 
-const userValidation = (data, regType) => {
-  const schema = joi.object({
-    username: joi.string().required().messages({
-      "string.base": "Username must be a string",
-      "string.empty": "Username is required",
-    }),
-    email: joi.string().email().required().messages({
-      "string.base": "Email must be a string",
-      "string.email": "Email must be a valid email address",
-      "string.empty": "Email is required",
-    }),
-    password:
-      regType === "Google"
-        ? joi.string().optional()
-        : joi.string().required().messages({
-            "string.base": "Password must be a string",
-            "string.empty": "Password is required",
-          }),
-    dateOfBirth:
-      regType === "Google"
-        ? joi.date().optional()
-        : joi.date().required().max("now").messages({
-            "date.base": "Date of birth must be a valid date",
-            "date.empty": "Date of birth is required",
-            "date.max": "Date of birth cannot be in the future",
-          }),
-    gender:
-      regType === "Google"
-        ? joi.string().valid("Male", "Female", "Non-Binary", "Other").optional()
-        : joi
-            .string()
-            .valid("Male", "Female", "Non-Binary", "Other")
-            .required()
-            .messages({
-              "string.base": "Gender must be a string",
-              "any.only":
-                "Gender must be one of ['Male', 'Female', 'Non-Binary', 'Other']",
-              "string.empty": "Gender is required",
-            }),
-  });
-};
 
 //user registration
 
@@ -122,6 +80,7 @@ const userLogin = async (req, res) => {
     expiresIn: "2h",
   });
   res.cookie("token", token);
+  
   res.status(200).json({
     userData,
     token,
@@ -140,7 +99,7 @@ const googleLogin = async (req, res) => {
   const googleData = await response.json();
   const { email, name, picture } = googleData;
   let user = await UserSchema.findOne({ email });
-  console.log(user);
+ 
   if (!user) {
     user = new UserSchema({
       username: name,
@@ -220,9 +179,51 @@ const passwordSave = async (req, res) => {
 
 // user view profail
 
-const viewProfail = async(req,res)=>{
+const viewProfail = async (req, res) => {
+  const { token } = req.cookies;
+ 
+  const valid = await jwt.verify(token, process.env.jwt_secret);
+  const userId = valid.id;
+
+  const user = await UserSchema.findById({ _id: userId });
+
+  res.status(200).json({
+    status: "Succes",
+    user,  
+  });
+};
+
+// edit profail
+
+const editProfail = async(req,res) => {
+  const {token} = req.cookies
+  const valid = await jwt.verify(token,process.env.jwt_secret)
+
+  const userId = valid.id;
+
   
+  const data = req.body;
+  const {username,email,dateOfBirth,gender,profilePicture} = data
+  
+  const user = await UserSchema.findById({_id:userId})
+
+  user.profilePicture = req.cloudinaryImageUrl
+
+  await UserSchema.findByIdAndUpdate({_id},{
+    username,
+    email,
+    dateOfBirth,
+    gender,
+    profilePicture:req.cloudinaryImageUrl
+  })
+res.status(201).json({
+  message:"profail updated"
+})
 }
+
+
+
+
 
 module.exports = {
   userRegiser,
@@ -230,4 +231,6 @@ module.exports = {
   googleLogin,
   forgotPassword,
   passwordSave,
+  viewProfail,
+  editProfail
 };

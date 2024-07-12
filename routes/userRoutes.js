@@ -9,6 +9,8 @@ userRoutes.post("/user/login", tryCatch(controller.userLogin));
 userRoutes.post("/google-login", tryCatch(controller.googleLogin));
 userRoutes.post("/password-reset",tryCatch(controller.forgotPassword))
 userRoutes.post("/reset/:token",tryCatch(controller.passwordSave))
+userRoutes.get("/user/view-profail",userAuth,tryCatch(controller.viewProfail))
+userRoutes.put('/user/edit-profail',userAuth,tryCatch(controller.editProfail))
 // userRoutes.post('/send-otp',tryCatch(controller.sendOtp))
 // userRoutes.post('/verify-otp',tryCatch(controller.verifyOtp))
 

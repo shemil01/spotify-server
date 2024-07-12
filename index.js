@@ -4,6 +4,7 @@ dotenv.config({ path: "./config/.env" });
 const cors = require("cors");
 const DbConnect = require("./config/DbConnection");
 const userRout = require("./routes/userRoutes");
+const cookieParser = require("cookie-parser");
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(cors({
 }))
 
 app.use(express.json());
+app.use(cookieParser());
 app.use("/api", userRout);
 
 DbConnect();
