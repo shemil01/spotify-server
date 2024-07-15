@@ -5,8 +5,7 @@ const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
-
-
+const cloudinary = require("cloudinary").v2;
 
 //user registration
 
@@ -50,6 +49,17 @@ const userRegiser = async (req, res) => {
   });
 };
 
+//email check
+
+const emailExist = async(req,res)=>{
+  const {email} = req.body
+
+const isExist = await UserSchema.findOne({email})
+if(isExist){
+  res.status(400).send("email already exist")
+}
+}
+
 //User  Login
 const userLogin = async (req, res) => {
   const { email, username, password } = req.body;
@@ -80,7 +90,7 @@ const userLogin = async (req, res) => {
     expiresIn: "2h",
   });
   res.cookie("token", token);
-  
+
   res.status(200).json({
     userData,
     token,
@@ -99,7 +109,7 @@ const googleLogin = async (req, res) => {
   const googleData = await response.json();
   const { email, name, picture } = googleData;
   let user = await UserSchema.findOne({ email });
- 
+
   if (!user) {
     user = new UserSchema({
       username: name,
@@ -181,7 +191,7 @@ const passwordSave = async (req, res) => {
 
 const viewProfail = async (req, res) => {
   const { token } = req.cookies;
- 
+
   const valid = await jwt.verify(token, process.env.jwt_secret);
   const userId = valid.id;
 
@@ -189,41 +199,44 @@ const viewProfail = async (req, res) => {
 
   res.status(200).json({
     status: "Succes",
-    user,  
+    user,
   });
 };
 
 // edit profail
 
-const editProfail = async(req,res) => {
-  const {token} = req.cookies
-  const valid = await jwt.verify(token,process.env.jwt_secret)
+const editProfaile = async (req, res) => {
+  const { token } = req.cookies;
+  const valid = await jwt.verify(token, process.env.jwt_secret);
 
   const userId = valid.id;
+  console.log(userId)
 
-  
   const data = req.body;
-  const {username,email,dateOfBirth,gender,profilePicture} = data
+  const { username, email, dateOfBirth, gender, profilePicture } = data;
+  const user = await UserSchema.findById({ _id: userId });
   
-  const user = await UserSchema.findById({_id:userId})
-
-  user.profilePicture = req.cloudinaryImageUrl
-
-  await UserSchema.findByIdAndUpdate({_id},{
-    username,
-    email,
-    dateOfBirth,
-    gender,
-    profilePicture:req.cloudinaryImageUrl
-  })
-res.status(201).json({
-  message:"profail updated"
-})
-}
+  
 
 
+  const updatedUser = await UserSchema.findByIdAndUpdate(
+    userId,
+    {
+      username,
+      email,
+      dateOfBirth,
+      gender,
+      profilePicture: req.cloudinaryImageUrl || user.profilePicture,
+    },
+    { new: true }
+  );
+  
+  res.status(201).json({
+    message: "profail updated",
+    updatedUser
+  }); 
 
-
+};
 
 module.exports = {
   userRegiser,
@@ -232,5 +245,5 @@ module.exports = {
   forgotPassword,
   passwordSave,
   viewProfail,
-  editProfail
+  editProfaile,
 };

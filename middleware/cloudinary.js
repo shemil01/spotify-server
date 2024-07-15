@@ -1,43 +1,48 @@
-const cloudinary = require('cloudinary').v2
-const multer = require('multer')
-require('dotenv').config({path:'../config/.env'})
-const path = require('path');
+const cloudinary = require('cloudinary').v2;
+const multer = require('multer');
+const path = require('path'); // Require path module before using it
+require('dotenv').config({ path: path.join(__dirname, '../config/.env') });
 const fs = require('fs');
 
-//configure cloudinary
+// Configure Cloudinary
 cloudinary.config({
-    cloud_name:process.env.CLOUDINARY_NAME,
-    api_key:process.env.CLOUDINARY_API_KEY,
-    api_secret:process.env.CLOUDINARY_API_SECRET
-})
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
-// Multer storage configeration
- const storage = multer.diskStorage({})
+// Multer storage configuration
+const storage = multer.diskStorage({});
 
-// Multer upload configeration
-
-const upload = multer({storage:storage}) 
+// Multer upload configuration
+const upload = multer({ storage: storage });
 
 // Middleware to upload image to Cloudinary or use provided URL
+const uploadImage = (req, res, next) => {
+    upload.single("profilePicture")(req, res, async (error) => {
+        if (error) {
+            console.error(error);
+            return next(error);
+        }
 
-const uploadImage = (req,res,next)=>{
-    upload.single("image")(req,res,async(error) => {
-        try{
-            if(req.file){
-                const result = await cloudinary.uploader.upload(req.file.path)
+        try {
+            if (req.file) {
+                const result = await cloudinary.uploader.upload(req.file.path);
                 req.cloudinaryImageUrl = result.secure_url;
 
-                //Delete the local file after the uploading
-                fs.unlinkSync(req.file.path); 
-            }else if(req.body.imageUrl){
+                // Delete the local file after uploading
+                fs.unlink(req.file.path, (err) => {
+                    if (err) console.error(err);
+                });
+            } else if (req.body.imageUrl) {
                 req.cloudinaryImageUrl = req.body.imageUrl;
             }
-            next()
-            }catch (error){
-                console.error(error)
-                next(error)
-            }
-    })
+            next();
+        } catch (error) {
+            console.error(error);
+            next(error);
+        }
+    });
 }
 
-module.exports = {cloudinary,uploadImage}
+module.exports = { cloudinary, uploadImage };
