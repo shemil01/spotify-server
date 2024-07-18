@@ -6,6 +6,7 @@ const { tryCatch } = require("../utils/tryCatch");
 const { uploadImage } = require("../middleware/cloudinary")
 
 userRoutes.post("/user/register", tryCatch(controller.userRegiser));
+userRoutes.post("/user/email-check",tryCatch(controller.emailExist))
 userRoutes.post("/user/login", tryCatch(controller.userLogin));
 userRoutes.post("/google-login", tryCatch(controller.googleLogin));
 userRoutes.post("/password-reset",tryCatch(controller.forgotPassword))

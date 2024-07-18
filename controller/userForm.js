@@ -11,7 +11,6 @@ const cloudinary = require("cloudinary").v2;
 
 const userRegiser = async (req, res) => {
   const { username, email, password, dateOfBirth, gender } = req.body;
-  console.log(req.body);
 
   if (!(username && email && password && dateOfBirth && gender)) {
     res.status(400).json({
@@ -21,7 +20,9 @@ const userRegiser = async (req, res) => {
   const userExist = await UserSchema.findOne({ email });
 
   if (userExist) {
-    res.status(401).send("User already exist ");
+    return res.status(401).json({
+      message: "User already exist ",
+    });
   }
 
   //password bcrypt
@@ -51,14 +52,24 @@ const userRegiser = async (req, res) => {
 
 //email check
 
-const emailExist = async(req,res)=>{
-  const {email} = req.body
+const emailExist = async (req, res) => {
+  const { email } = req.body;
 
-const isExist = await UserSchema.findOne({email})
-if(isExist){
-  res.status(400).send("email already exist")
-}
-}
+  const isExist = await UserSchema.findOne({ email });
+
+  if (isExist) {
+    console.log(email, "just for  check in exist");
+    return res.status(409).json({
+      message: "User already exist",
+      success: false,
+    });
+  } else {
+    return res.status(200).json({
+      message: "New user",
+      success: true,
+    });
+  }
+};
 
 //User  Login
 const userLogin = async (req, res) => {
@@ -210,14 +221,18 @@ const editProfaile = async (req, res) => {
   const valid = await jwt.verify(token, process.env.jwt_secret);
 
   const userId = valid.id;
-  console.log(userId)
 
   const data = req.body;
   const { username, email, dateOfBirth, gender, profilePicture } = data;
+  console.log(data);
   const user = await UserSchema.findById({ _id: userId });
-  
-  
 
+  const emailExist = await UserSchema.findOne({ email, username });
+  if (emailExist) {
+    res.status(400).json({
+      message: "email or username already exist",
+    });
+  }
 
   const updatedUser = await UserSchema.findByIdAndUpdate(
     userId,
@@ -230,12 +245,11 @@ const editProfaile = async (req, res) => {
     },
     { new: true }
   );
-  
+
   res.status(201).json({
     message: "profail updated",
-    updatedUser
-  }); 
-
+    updatedUser,
+  });
 };
 
 module.exports = {
@@ -246,4 +260,5 @@ module.exports = {
   passwordSave,
   viewProfail,
   editProfaile,
+  emailExist,
 };
