@@ -1,32 +1,17 @@
 const mongoose = require('mongoose');
 
-
 const songSchema = new mongoose.Schema({
-  title: {
+  name: {
     type: String,
     required: true
   },
   artist: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Artist',
-    required: true
+    ref: 'User',
   },
   album: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Album',
-    required: true
-  },
-  duration: {
-    type: Number,
-    required: true 
-  },
-  genre: {
-    type: String,
-    required: true
-  },
-  releaseDate: {
-    type: Date,
-    required: true
   },
   fileUrl: {
     type: String,
@@ -36,10 +21,6 @@ const songSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  plays: {
-    type: Number,
-    default: 0 
-  },
   likedBy: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
@@ -47,7 +28,6 @@ const songSchema = new mongoose.Schema({
 }, {
   timestamps: true 
 });
-
 
 const Song = mongoose.model('Song', songSchema);
 

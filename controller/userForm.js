@@ -224,7 +224,7 @@ const editProfaile = async (req, res) => {
 
   const data = req.body;
   const { username, email, dateOfBirth, gender, profilePicture } = data;
-  console.log(data);
+  
   const user = await UserSchema.findById({ _id: userId });
 
   const emailExist = await UserSchema.findOne({ email, username });
