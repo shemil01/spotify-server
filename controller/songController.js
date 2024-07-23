@@ -2,9 +2,6 @@ const songSchema = require("../model/SongSchema");
 const cloudinary = require("cloudinary").v2;
 const cookieParser = require("cookie-parser");
 
-
-
-
 //add song
 const addSong = async (req, res) => {
   const { name, coverImage, fileUrl } = req.body;
@@ -31,35 +28,37 @@ const addSong = async (req, res) => {
   res.status(201).json({
     success: true,
     message: "Song added successfully",
-    newSong
+    newSong,
   });
 };
 
 // get songs
 
-const getSongs = async(req,res)=>{
+const getSongs = async (req, res) => {
+  const songs = await songSchema.find();
 
-
-    const songs = await songSchema.find()
-
-    if(songs.length === 0){
-        return res.status(404).json({
-            success:false,
-            message:"songs not found"
-        })
-    }
-    else{
-        res.status(200).json({
-            success:true,
-            songs,
-        })
-    }
-}
-
+  if (songs.length === 0) {
+    return res.status(404).json({
+      success: false,
+      message: "songs not found",
+    });
+  } else {
+    res.status(200).json({
+      success: true,
+      songs,
+    });
+  }
+};
 
 //view song by id
 
-// const  
+const getSongById = async(req,res)=>{
+  const  {songId} = req.params
+  const songData = await songSchema.findById({_id:songId})
+  if(songData)
+    return res.status(200).json({
+  success:true,
+songData})
+}
 
-
-module.exports = { addSong };
+module.exports = { addSong, getSongs,getSongById };

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const albumSchema = new mongoose.model(
+const plylistSchema = new mongoose.model(
     {
         title: {
             type: String,
@@ -21,4 +21,4 @@ const albumSchema = new mongoose.model(
     }
 )
 
-module.exports = mongoose.model("Album", albumSchema);
+module.exports = mongoose.model("Playlist", plylistSchema);

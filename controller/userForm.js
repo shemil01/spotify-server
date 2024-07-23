@@ -47,6 +47,8 @@ const userRegiser = async (req, res) => {
   res.status(200).json({
     success: true,
     message: "Account created successfully",
+    token,
+    userData:user
   });
 };
 
@@ -229,9 +231,9 @@ const editProfaile = async (req, res) => {
 
   const emailExist = await UserSchema.findOne({ email, username });
   if (emailExist) {
-    res.status(400).json({
+   return res.status(400).json({
       message: "email or username already exist",
-    });
+    });     
   }
 
   const updatedUser = await UserSchema.findByIdAndUpdate(
