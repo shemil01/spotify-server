@@ -1,24 +1,25 @@
 const mongoose = require('mongoose')
 
-const plylistSchema = new mongoose.model(
+const playlistSchema = new mongoose.Schema(
     {
         title: {
             type: String,
             required: true
-          },
-          artist: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Artist',
+        },
+        artist: {
+            type: String,
             required: true
-          },
-          songs: [{
+            // type: mongoose.Schema.Types.ObjectId,
+            // ref: 'Artist',
+        },
+        songs: [{
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Song'
-          }],
-          coverImage:String,
-          genre:String,
-          releaseDate:Date,
+        }],
+        coverImage: String,
+        genre: String,
+        releaseDate: Date,
     }
 )
 
-module.exports = mongoose.model("Playlist", plylistSchema);
+module.exports = mongoose.model("Playlist", playlistSchema);

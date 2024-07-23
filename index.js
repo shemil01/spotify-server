@@ -5,6 +5,7 @@ const cors = require("cors");
 const DbConnect = require("./config/DbConnection");
 const userRout = require("./routes/userRoutes");
 const songRout = require('./routes/songRout')
+const playlistRout = require('./routes/PlaListRout')
 const cookieParser = require("cookie-parser");
 
 const app = express();
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use("/api", userRout);
 app.use('/api',songRout)
+app.use('/api',playlistRout)
 
 DbConnect();
 
