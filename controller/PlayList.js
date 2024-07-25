@@ -3,30 +3,31 @@ const Playlist = require("../model/plylistSchema");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 
-
-
-//add to playlist 
+//create playlist
 const addPlayList = async (req, res) => {
   const { songId } = req.params;
-  const data= req.body;
+  const { title, coverImage } = req.body;
   const { token } = req.cookies;
 
   if (!token) {
-      return res.status(401).json({ success: false, message: 'Authentication token is required' });
+    return res
+      .status(401)
+      .json({ success: false, message: "Authentication token is required" });
   }
 
   const valid = await jwt.verify(token, process.env.JWT_SECRET);
   const userId = valid.id;
 
-  if (!data.title || !coverImage || !data.artist) {
-    return res
-      .status(400)
-      .json({ success: false, message: "All fields are required" });
-  }
+  //   if (!data.title || !coverImage || !data.artist) {
+  //     return res
+  //       .status(400)
+  //       .json({ success: false, message: "All fields are required" });
+  //   }
 
   const newPlaylist = await Playlist.create({
     title,
-    artist,
+
+    userId,
     songs: [songId],
     coverImage: req.cloudinaryImageUrl || coverImage,
   });
@@ -38,16 +39,15 @@ const addPlayList = async (req, res) => {
   });
 };
 
-
 //add to existing play list
-const addTOExistPlaylist = async(req,res) => {
-    const { songId, playlistId } = req.body;
+const addTOExistPlaylist = async (req, res) => {
+  const { songId, playlistId } = req.body;
 
   let checkPlaylist = await Playlist.findById(playlistId).populate("songs");
 
   if (checkPlaylist) {
-    checkPlaylist.songs.push(songId); 
-    await checkPlaylist.save(); 
+    checkPlaylist.songs.push(songId);
+    await checkPlaylist.save();
 
     res.status(201).json({
       success: true,
@@ -56,24 +56,45 @@ const addTOExistPlaylist = async(req,res) => {
   } else {
     res.status(404).json({ success: false, message: "Playlist not found" });
   }
+};
+// view playlists
 
-}
+const viewPlaylist = async (req, res) => {
+  const { token } = req.cookies;
 
-//view playlist
+  const valid = jwt.verify(token, process.env.JWT_SECRET);
 
-const viewPlaylist = async(req,res) => {
-    const {playlistId} = req.params
+  const userId = valid.id;
+  const playlist = await Playlist.findOne({ userId }).populate("songs");
+  console.log('pla',playlist)
+  if (playlist) {
+    res.status(200).json({
+      success: true,
+      playlist,
+    });
+  }
+};
 
-    const playlists = await Playlist.findById(playlistId).populate("songs")
+//view playlist by id
 
-    if(playlists) {
-        res.status(200).json({
-            success:true,
-            playlists:playlists
-        })
-    }else{
-        res.status(404).json({ success: false, message: "Playlist not found" });
-    }
-}
+const getPlaylistById = async (req, res) => {
+  const { playlistId } = req.params;
 
-module.exports = { addPlayList,addTOExistPlaylist,viewPlaylist };
+  const playlists = await Playlist.findById(playlistId).populate("songs");
+
+  if (playlists) {
+    res.status(200).json({
+      success: true,
+      playlists: playlists,
+    });
+  } else {
+    res.status(404).json({ success: false, message: "Playlist not found" });
+  }
+};
+
+module.exports = {
+  addPlayList,
+  addTOExistPlaylist,
+  getPlaylistById,
+  viewPlaylist,
+};

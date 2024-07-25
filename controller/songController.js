@@ -7,7 +7,7 @@ const addSong = async (req, res) => {
   const { name, coverImage, fileUrl } = req.body;
 
   //   if (!name || !coverImage || !fileUrl) {
-  //     return res.status(400).json({
+  //     return res.status(400).json({        
   //       success: false,
   //       message: "Please fill all fields",
   //     });
@@ -54,6 +54,7 @@ const getSongs = async (req, res) => {
 
 const getSongById = async(req,res)=>{
   const  {songId} = req.params
+  
   const songData = await songSchema.findById({_id:songId})
   if(songData)
     return res.status(200).json({

@@ -104,6 +104,7 @@ const userLogin = async (req, res) => {
   });
   res.cookie("token", token);
 
+
   res.status(200).json({
     userData,
     token,
