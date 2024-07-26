@@ -37,11 +37,8 @@ const userSchema = new mongoose.Schema(
     ],
     playlists: [
       {
-        playlistsId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "playlist",
-          required: true,
-        },
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Playlist",
       },
     ],
     subscriptionType: { type: String, default: "Free" },
