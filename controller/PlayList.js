@@ -126,18 +126,25 @@ const removeSong = async (req, res) => {
 const deletePlaylist = async (req, res) => {
   const { playlistId } = req.params;
   const { token } = req.cookies;
+
   const valid = jwt.verify(token, process.env.JWT_SECRET);
   const userId = valid.id;
-
-  const playlist = await Playlist.findOneAndDelete({ _id: playlistId, userId: userId });
+  console.log(userId);
+  const playlist = await Playlist.findOneAndDelete({
+    _id: playlistId,
+    userId: userId,
+  });
 
   if (!playlist) {
     return res.status(404).send("playlist not found");
   }
- res.status(200).json({
-  success:true,
-  message:"Playlist deleted"
- })
+  await userSchema.findByIdAndUpdate(userId, {
+    $pull: { playlists: playlistId },
+  });
+  res.status(200).json({
+    success: true,
+    message: "Playlist deleted",
+  });
 };
 
 module.exports = {
