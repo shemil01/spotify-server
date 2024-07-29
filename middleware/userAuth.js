@@ -11,7 +11,7 @@ const userAuth = tryCatch(async(req,res,next)=>{
             message:"Unauthorized token is missing"
         })
     }
-    const decoded = jwt.verify(token,process.env.jwt_secret)
+    const decoded = jwt.verify(token,process.env.JWT_SECRET)
     const user = await userSchema.findById(decoded.id)
     if(!user){
         res.status(404).json({

@@ -37,7 +37,7 @@ const userRegiser = async (req, res) => {
   });
   //generate token
 
-  const token = jwt.sign({ id: user._id }, process.env.jwt_secret, {
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
     expiresIn: "2h",
   });
   // user.token = token;
@@ -48,7 +48,7 @@ const userRegiser = async (req, res) => {
     success: true,
     message: "Account created successfully",
     token,
-    userData:user
+    userData: user,
   });
 };
 
@@ -99,11 +99,10 @@ const userLogin = async (req, res) => {
       message: "Incorrect password",
     });
   }
-  const token = jwt.sign({ id: userData._id }, process.env.jwt_secret, {
+  const token = jwt.sign({ id: userData._id }, process.env.JWT_SECRET, {
     expiresIn: "2h",
   });
   res.cookie("token", token);
-
 
   res.status(200).json({
     userData,
@@ -133,7 +132,7 @@ const googleLogin = async (req, res) => {
     });
     await user.save();
   }
-  const jwt_token = jwt.sign({ id: user._id }, process.env.jwt_secret, {
+  const jwt_token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
     expiresIn: "2h",
   });
 
@@ -206,7 +205,7 @@ const passwordSave = async (req, res) => {
 const viewProfail = async (req, res) => {
   const { token } = req.cookies;
 
-  const valid = await jwt.verify(token, process.env.jwt_secret);
+  const valid = await jwt.verify(token, process.env.JWT_SECRET);
   const userId = valid.id;
 
   const user = await UserSchema.findById({ _id: userId });
@@ -221,20 +220,20 @@ const viewProfail = async (req, res) => {
 
 const editProfaile = async (req, res) => {
   const { token } = req.cookies;
-  const valid = await jwt.verify(token, process.env.jwt_secret);
+  const valid = await jwt.verify(token, process.env.JWT_SECRET);
 
   const userId = valid.id;
 
   const data = req.body;
   const { username, email, dateOfBirth, gender, profilePicture } = data;
-  
+
   const user = await UserSchema.findById({ _id: userId });
 
   const emailExist = await UserSchema.findOne({ email, username });
   if (emailExist) {
-   return res.status(400).json({
+    return res.status(400).json({
       message: "email or username already exist",
-    });     
+    });
   }
 
   const updatedUser = await UserSchema.findByIdAndUpdate(

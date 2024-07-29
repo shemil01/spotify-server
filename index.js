@@ -6,6 +6,7 @@ const DbConnect = require("./config/DbConnection");
 const userRout = require("./routes/userRoutes");
 const songRout = require('./routes/songRout')
 const playlistRout = require('./routes/PlyaListRout')
+const adminRout = require('./routes/adminRoute')
 const cookieParser = require("cookie-parser");
 
 const app = express();
@@ -21,6 +22,7 @@ app.use(cookieParser());
 app.use("/api", userRout);
 app.use('/api',songRout)
 app.use('/api',playlistRout)
+app.use('/api',adminRout)
 
 DbConnect();
 
