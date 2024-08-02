@@ -7,7 +7,7 @@ const userSchema = require("../model/User");
 //create playlist
 const addPlayList = async (req, res) => {
   const { songId } = req.params;
-  const { title, coverImage } = req.body;
+  const { title, coverImage, description } = req.body;
   if (!title) {
     return res.status(400).send("Enter a Title");
   }
@@ -28,6 +28,7 @@ const addPlayList = async (req, res) => {
   const newPlaylist = await Playlist.create({
     title,
     userId,
+    description,
     songs: [songId],
     coverImage: req.cloudinaryImageUrl || coverImage,
   });
@@ -98,21 +99,24 @@ const getPlaylistById = async (req, res) => {
 
 const removeSong = async (req, res) => {
   const { token } = req.cookies;
+
   const { songId } = req.params;
 
   const valid = jwt.verify(token, process.env.JWT_SECRET);
   const userId = valid.id;
 
-  const user = await Playlist.findOne({ userId: userId });
-  if (!user) {
+  const playlist = await Playlist.findOne({ userId: userId });
+
+  if (!playlist) {
     res.status(404).send("Playlist is empty");
   }
 
-  const songIndex = user.songs.findIndex((song) => song.toString() === songId);
-
+  const songIndex = playlist.songs.findIndex(
+    (song) => song.toString() === songId
+  );
   if (songIndex !== -1) {
-    user.songs.splice(songIndex, 1);
-    await user.save();
+    playlist.songs.splice(songIndex, 1);
+    await playlist.save();
     return res.status(200).json({
       message: "Song removed from playlist",
       success: true,

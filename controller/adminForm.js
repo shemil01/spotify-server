@@ -33,4 +33,6 @@ const adminLogin = async (req, res) => {
 
   })
 };
+
+// view user
 module.exports = { adminLogin};
