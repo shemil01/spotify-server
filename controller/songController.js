@@ -62,4 +62,31 @@ const getSongById = async(req,res)=>{
 songData})
 }
 
-module.exports = { addSong, getSongs,getSongById };
+//serch songs
+const searchSong = async (req, res) => {
+const query = req.query.q;
+
+const suggestions = await songSchema.find({
+  name: { $regex: query, $options: 'i' }
+}).limit(5);
+
+const results = await songSchema.find({
+  name: { $regex: query, $options: 'i' }
+})
+  // if (results.length === 0) {
+  //   return res.status(404).json({
+  //     success: false,
+  //     message: "This Song not found",
+  //   });
+  // }
+  res.status(200).json({
+    success: true,
+    song: results,
+    suggestions:suggestions
+  });
+};
+
+
+
+
+module.exports = { addSong, getSongs,getSongById,searchSong };

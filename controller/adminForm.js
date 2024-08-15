@@ -2,6 +2,7 @@
 const bcrypt = require("bcryptjs");
 const { constants } = require("crypto");
 const jwt = require("jsonwebtoken");
+const User = require('../model/User')
 
 //admin login
 const adminLogin = async (req, res) => {
@@ -19,7 +20,7 @@ const adminLogin = async (req, res) => {
   if (!validation) {
     res.status(400).json({
       success: false,
-      message: "Email or password or in correct",
+      message: "invalid Email or password",
     });
   }
   const adminToken = jwt.sign({
@@ -30,9 +31,22 @@ const adminLogin = async (req, res) => {
   res.status(201).json({
     message:"Login compleated",
     success:true,
-
+adminToken
   })
 };
 
-// view user
-module.exports = { adminLogin};
+// view all users
+
+const viewUsers = async(req,res) => {
+  const user = await User.find()
+  if(!user){
+    return res.status(404).json({
+      message:"Users is Empty"
+    })
+  }
+  res.status(200).json({
+    success:true,
+    user
+  })
+}
+module.exports = { adminLogin,viewUsers};

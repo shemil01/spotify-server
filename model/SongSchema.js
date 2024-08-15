@@ -9,9 +9,9 @@ const songSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   },
-  album: {
+  playlist: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Album',
+    ref: 'Playlist',
   },
   fileUrl: {
     type: String,

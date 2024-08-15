@@ -9,4 +9,5 @@ const userAuth = require('../middleware/userAuth')
 songRouter.post('/add-song',uploadFiles,tryCatch(controller.addSong))
 songRouter.get('/view-songs',tryCatch(controller.getSongs))
 songRouter.get('/song-by-id/:songId',tryCatch(controller.getSongById))
+songRouter.get('/search-song', tryCatch(controller.searchSong));   
 module.exports = songRouter
