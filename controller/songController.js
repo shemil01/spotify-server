@@ -62,7 +62,7 @@ const getSongById = async(req,res)=>{
 songData})
 }
 
-//serch songs
+//search songs
 const searchSong = async (req, res) => {
 const query = req.query.q;
 
