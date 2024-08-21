@@ -6,11 +6,14 @@ const cookieParser = require("cookie-parser");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const cloudinary = require("cloudinary").v2;
+const { parse } = require('date-fns');    
 
 //user registration
 
 const userRegiser = async (req, res) => {
   const { username, email, password, dateOfBirth, gender } = req.body;
+ 
+  const parsedDateOfBirth = parse(dateOfBirth, 'dd/MM/yyyy', new Date());
 
   if (!(username && email && password && dateOfBirth && gender)) {
     res.status(400).json({
@@ -32,7 +35,7 @@ const userRegiser = async (req, res) => {
     username,
     email,
     password: hashPassword,
-    dateOfBirth,
+    dateOfBirth:parsedDateOfBirth,
     gender,
   });
   //generate token

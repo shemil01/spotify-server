@@ -20,6 +20,13 @@ const userAuth = tryCatch(async(req,res,next)=>{
         })
     }
     req.user = user
+
+    if (user.role !== 'artist') {
+        return res.status(403).json({
+            success: false,
+            message: "Access denied. Not an artist."
+        });
+    }
     next()
 })
 module.exports = userAuth

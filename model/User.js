@@ -52,6 +52,7 @@ const userSchema = new mongoose.Schema(
         return this.loginMethod !== "Google";
       },
     },
+    role: { type: String, enum: ['user', 'artist', 'admin'], default: 'user' }, 
     gender: {
       type: String,
       enum: ["Male", "Female", "Non-Binary", "Other"],
