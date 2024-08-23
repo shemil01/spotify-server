@@ -1,25 +1,30 @@
-const jwt = require('jsonwebtoken')
-const adminSchema = require('../model/AdminSchema')
-const {tryCatch} = require('../utils/tryCatch') 
+const jwt = require("jsonwebtoken");
+const adminSchema = require("../model/AdminSchema");
+const { tryCatch } = require("../utils/tryCatch");
 
-const adminAuth = tryCatch(async(req,res,next)=>{
-    const {token} = req.cookies;
+const adminAuth = tryCatch(async (req, res, next) => {
+  const { adminToken } = req.cookies;
 
-    if(!token){
-        req.status(401).json({
-            success:false,
-            message:"Unauthorzed token is missing"
-        })
-    }
-    const decoded = jwt.verify(token,process.env.JWT_SECRET)
-    const admin = await adminSchema.findById(decoded.id)
-    if(!admin){
-        res.status(404).json({
-            success:false,
-            message:"Not admin"
-        })
-    }
-    req.admin = admin
-    next()
-}) 
-module.exports = adminAuth
+  if (!adminToken) {
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized, token is missing",
+    });
+  }
+
+  const decoded = jwt.verify(adminToken, process.env.JWT_ADMIN);
+
+  const admin = await adminSchema.find();
+
+  if (!admin) {
+    return res.status(404).json({
+      success: false,
+      message: "Not an admin",
+    });
+  }
+
+  req.admin = admin;
+  next();
+});
+
+module.exports = adminAuth;

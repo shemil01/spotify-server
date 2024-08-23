@@ -5,7 +5,7 @@ const cookieParser = require("cookie-parser");
 //add song
 const addSong = async (req, res) => {
   const { name, coverImage, fileUrl, artist, duration, description } = req.body;
-console.log(req.body)
+  console.log(req.body);
   const isExist = await songSchema.findOne({ name });
   if (isExist) {
     return res.status(400).json({
@@ -20,7 +20,7 @@ console.log(req.body)
     fileUrl: req.cloudinaryAudioUrl || newSong.fileUrl,
     artist,
     description,
-    duration
+    duration,
   });
   res.status(201).json({
     success: true,
@@ -60,6 +60,19 @@ const getSongById = async (req, res) => {
     });
 };
 
+//Delete song
+const deleteSong = async (req,res) =>{
+  const {songId} = req.params
+  const song = await songSchema.findByIdAndDelete({
+    _id:songId
+  })
+  res.status(200).json({
+    success:true,
+    message:"Song deleted"
+  })
+}
+
+
 //search songs
 const searchSong = async (req, res) => {
   const query = req.query.q;
@@ -73,12 +86,7 @@ const searchSong = async (req, res) => {
   const results = await songSchema.find({
     name: { $regex: query, $options: "i" },
   });
-  // if (results.length === 0) {
-  //   return res.status(404).json({
-  //     success: false,
-  //     message: "This Song not found",
-  //   });
-  // }
+
   res.status(200).json({
     success: true,
     song: results,
@@ -86,4 +94,4 @@ const searchSong = async (req, res) => {
   });
 };
 
-module.exports = { addSong, getSongs, getSongById, searchSong };
+module.exports = { addSong, getSongs, getSongById, searchSong,deleteSong };

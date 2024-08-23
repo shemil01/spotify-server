@@ -6,14 +6,14 @@ const cookieParser = require("cookie-parser");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const cloudinary = require("cloudinary").v2;
-const { parse } = require('date-fns');    
+const { parse } = require("date-fns");
 
 //user registration
 
 const userRegiser = async (req, res) => {
   const { username, email, password, dateOfBirth, gender } = req.body;
- 
-  const parsedDateOfBirth = parse(dateOfBirth, 'dd/MM/yyyy', new Date());
+
+  const parsedDateOfBirth = parse(dateOfBirth, "dd/MM/yyyy", new Date());
 
   if (!(username && email && password && dateOfBirth && gender)) {
     res.status(400).json({
@@ -35,7 +35,7 @@ const userRegiser = async (req, res) => {
     username,
     email,
     password: hashPassword,
-    dateOfBirth:parsedDateOfBirth,
+    dateOfBirth: parsedDateOfBirth,
     gender,
   });
   //generate token
@@ -44,7 +44,11 @@ const userRegiser = async (req, res) => {
     expiresIn: "2h",
   });
   // user.token = token;
-  res.cookie("token", token);
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "None",
+  });
 
   user.password = undefined;
   res.status(200).json({
@@ -102,10 +106,14 @@ const userLogin = async (req, res) => {
       message: "Incorrect password",
     });
   }
-  const token = jwt.sign({ id: userData._id }, process.env.JWT_SECRET, {
-    expiresIn: "2h",
+  // const token = jwt.sign({ id: userData._id }, process.env.JWT_SECRET);
+  const token = jwt.sign({ id: userData._id }, process.env.JWT_SECRET);
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "None",
   });
-  res.cookie("token", token);
 
   res.status(200).json({
     userData,
@@ -117,10 +125,10 @@ const userLogin = async (req, res) => {
 //google
 
 const googleLogin = async (req, res) => {
-  const { token } = req.body;
+  const { access_token } = req.body;
 
   const response = await fetch(
-    `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${token}`
+    `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${access_token}`
   );
   const googleData = await response.json();
   const { email, name, picture } = googleData;
@@ -135,14 +143,23 @@ const googleLogin = async (req, res) => {
     });
     await user.save();
   }
-  const jwt_token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "2h",
-  });
+ 
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '2h' });
 
-  res.cookie("token", jwt_token);
+  
+
+  res.cookie("token", token, {
+    httpOnly: true, // Makes cookie inaccessible via client-side JavaScript
+    secure: process.env.NODE_ENV === 'production', // Ensure this is true in production (HTTPS only)
+    sameSite: "None", // Necessary if you're making cross-site requests
+  });
+  
+
+ 
+
   res.status(200).json({
     userData: user,
-    token: jwt_token,
+    token: token,
     message: "Login successfull",
   });
 };
