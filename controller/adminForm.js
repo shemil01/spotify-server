@@ -29,7 +29,7 @@ const adminLogin = async (req, res) => {
 
   const adminToken = jwt.sign(
     {
-      email: email,
+      id: admin._id,
     },
     process.env.JWT_ADMIN
   );

@@ -34,7 +34,7 @@ const uploadFiles = (req, res, next) => {
     upload.fields([{ name: 'coverImage', maxCount: 1 }, { name: 'fileUrl', maxCount: 1 }])(req, res, async (error) => {
         if (error) {
             console.error('Multer Error:', error);
-            return next(error);       
+            return next(error);            
         }
 
         try {

@@ -17,6 +17,7 @@ songRouter.post(
 songRouter.get("/view-songs", userAuth, tryCatch(controller.getSongs));
 songRouter.get("/admin/songs", adminAuth, tryCatch(controller.getSongs));
 songRouter.get("/song-by-id/:songId",userAuth,tryCatch(controller.getSongById));
-songRouter.delete('/admin/delete-song',adminAuth,tryCatch(controller.deleteSong))
+songRouter.get("/admin/songby-id/:songId",adminAuth,tryCatch(controller.getSongById));
+songRouter.delete('/admin/delete-song/:songId',adminAuth,tryCatch(controller.deleteSong))
 songRouter.get("/search-song", userAuth, tryCatch(controller.searchSong));
 module.exports = songRouter;

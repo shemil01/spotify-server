@@ -51,7 +51,7 @@ const getSongs = async (req, res) => {
 
 const getSongById = async (req, res) => {
   const { songId } = req.params;
-
+console.log(songId)
   const songData = await songSchema.findById({ _id: songId });
   if (songData)
     return res.status(200).json({
