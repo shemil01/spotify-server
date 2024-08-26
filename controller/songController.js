@@ -5,7 +5,7 @@ const cookieParser = require("cookie-parser");
 //add song
 const addSong = async (req, res) => {
   const { name, coverImage, fileUrl, artist, duration, description } = req.body;
-  console.log(req.body);
+
   const isExist = await songSchema.findOne({ name });
   if (isExist) {
     return res.status(400).json({
@@ -26,6 +26,37 @@ const addSong = async (req, res) => {
     success: true,
     message: "Song added successfully",
     newSong,
+  });
+};
+
+// edit song
+
+const editSong = async (req, res) => {
+  const { songId } = req.params;
+  const { name, coverImage, fileUrl, artist, duration, description } = req.body;
+  console.log(req.body)
+
+  const song = await songSchema.findById(songId);
+  if (!song) {
+    return res.status(404).json({
+      success: false,
+      message: "Song not  found",
+    });
+  }
+  await songSchema.findByIdAndUpdate(
+    { _id: songId },
+    {
+      name,
+      coverImage: req.cloudinaryImageUrl ,
+      fileUrl: req.cloudinaryAudioUrl,
+      artist,
+      duration,
+      description,
+    }
+  );
+  res.status(201).json({
+    success: true,
+    message: "Song updated ",
   });
 };
 
@@ -51,7 +82,7 @@ const getSongs = async (req, res) => {
 
 const getSongById = async (req, res) => {
   const { songId } = req.params;
-console.log(songId)
+
   const songData = await songSchema.findById({ _id: songId });
   if (songData)
     return res.status(200).json({
@@ -61,17 +92,16 @@ console.log(songId)
 };
 
 //Delete song
-const deleteSong = async (req,res) =>{
-  const {songId} = req.params
+const deleteSong = async (req, res) => {
+  const { songId } = req.params;
   const song = await songSchema.findByIdAndDelete({
-    _id:songId
-  })
+    _id: songId,
+  });
   res.status(200).json({
-    success:true,
-    message:"Song deleted"
-  })
-}
-
+    success: true,
+    message: "Song deleted",
+  });
+};
 
 //search songs
 const searchSong = async (req, res) => {
@@ -94,4 +124,11 @@ const searchSong = async (req, res) => {
   });
 };
 
-module.exports = { addSong, getSongs, getSongById, searchSong,deleteSong };
+module.exports = {
+  addSong,
+  getSongs,
+  getSongById,
+  searchSong,
+  deleteSong,
+  editSong,
+};

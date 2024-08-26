@@ -56,21 +56,6 @@ const viewUsers = async (req, res) => {
     user,
   });
 };
-// //view songs
-// const viewSong = async (req, res) => {
-//   const songs = await Song.find();
-//   if (songs.length === 0) {
-//     return res.status(404).json({
-//       success: false,
-//       message: "Songs is Empty",
-//     });
-//   }
-//   res.status(200).json({
-//     success: true,
-//     songs,
-//   });
-// };
 
-// //view song by id
 
 module.exports = { adminLogin, viewUsers };

@@ -12,7 +12,7 @@ const adminAuth = tryCatch(async (req, res, next) => {
   }
   
   const decoded = jwt.verify(adminToken, process.env.JWT_ADMIN);
-  console.log("f",decoded)
+ 
 
   const admin = await adminSchema.findById(decoded.id);
 
@@ -20,7 +20,7 @@ const adminAuth = tryCatch(async (req, res, next) => {
     return res.status(404).json({
       success: false,
       message: "Not an admin",
-    });
+    }); 
   }
 
   req.admin = admin;
