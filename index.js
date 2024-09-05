@@ -13,7 +13,7 @@ const app = express();
        
 const port = process.env.port; 
 app.use(cors({
-  origin:"http://localhost:3000",
+  origin:"https://spotify-client-psi-black.vercel.app",
   credentials:true 
 }))
 
