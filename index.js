@@ -12,14 +12,14 @@ const cookieParser = require("cookie-parser");
 const app = express();
        
 const port = process.env.port; 
-app.use(cors({
-  origin:"https://localhost:3000",
-  credentials:true 
-}))
 // app.use(cors({
-//   origin:"https://spotify-client-psi-black.vercel.app",
+//   origin:"http://localhost:3000/",
 //   credentials:true 
 // }))
+app.use(cors({
+  origin:"https://spotify-client-psi-black.vercel.app",
+  credentials:true 
+}))
 
 app.use(express.json());
 app.use(cookieParser());
