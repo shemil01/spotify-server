@@ -33,7 +33,13 @@ const adminLogin = async (req, res) => {
     },
     process.env.JWT_ADMIN
   );
-  res.cookie("adminToken", adminToken);
+  res.cookie('adminToken', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'none', // or 'lax' if you're using the same domain
+    maxAge: 24 * 60 * 60 * 1000, // 1 day
+  });
+  
 
   res.status(201).json({
     message: "Login compleated",
