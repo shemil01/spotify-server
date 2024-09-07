@@ -3,29 +3,26 @@ const { constants } = require("crypto");
 const jwt = require("jsonwebtoken");
 const User = require("../model/User");
 const Song = require("../model/SongSchema");
-const Admin = require('../model/AdminSchema')
-
+const Admin = require("../model/AdminSchema");
 
 //admin login
 const adminLogin = async (req, res) => {
- 
   const { email, password } = req.body;
   if (!email || !password) {
     return res.status(400).json({ error: "Email and password are required" });
   }
 
-  const admin = await Admin.findOne({email})
-  if(!admin){
-   return res.status(404).json({
-      success:false,
-      message:"Email is incorrect"
-    })
+  const admin = await Admin.findOne({ email });
+  if (!admin) {
+    return res.status(404).json({
+      success: false,
+      message: "Email is incorrect",
+    });
   }
   const passwordMatch = await bcrypt.compare(password, admin.password);
   if (!passwordMatch) {
     return res.status(403).send("Incorrect password");
   }
-
 
   const adminToken = jwt.sign(
     {
@@ -33,13 +30,12 @@ const adminLogin = async (req, res) => {
     },
     process.env.JWT_ADMIN
   );
-  res.cookie('adminToken', token, {
+  res.cookie("adminToken", adminToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'none', // or 'lax' if you're using the same domain
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "none", // or 'lax' if you're using the same domain
     maxAge: 24 * 60 * 60 * 1000, // 1 day
   });
-  
 
   res.status(201).json({
     message: "Login compleated",
@@ -62,6 +58,5 @@ const viewUsers = async (req, res) => {
     user,
   });
 };
-
 
 module.exports = { adminLogin, viewUsers };
