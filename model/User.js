@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema(
     },
     likedSongs: [
       {
-        songsId: {
+        songId: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "song",
           required: true,

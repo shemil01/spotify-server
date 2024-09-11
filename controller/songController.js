@@ -135,20 +135,32 @@ const likeSong = async (req, res) => {
 
   const valid = await jwt.verify(token, process.env.JWT_SECRET);
   const userId = valid.id;
-  const checkSong = await userSchema.findById(userId).populate("likedSongs");
-  if (checkSong) {
-    checkSong.likedSongs.push(songId);
-    await checkSong.save();
-    res.status(201).json({
-      success: true,
-      message: "Song added to favourite",
-    });
-  } else {
-    res.status(404).json({
-      success: true,
-      message: "User not found",
-    });
-  }
+   const user = await userSchema.findById(userId)
+
+   if(!user){
+   return res.status(404).json({
+      success:false,
+      message:"User not found"
+    })
+   }
+
+   const isSongAlredyLiked = user.likedSongs.some(
+    (likedSong)=>likedSong.songId.toString()===songId
+   )
+
+   if(isSongAlredyLiked){
+   return res.status(400).json({
+      success:false,
+      message:"Song already liked"
+    })
+   }
+user.likedSongs.push({songId})
+await user.save()
+res.status(201).json({
+  success:true,
+  message:"Song added to favourite"
+})
+
 };
 
 module.exports = {
