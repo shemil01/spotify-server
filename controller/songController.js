@@ -135,32 +135,88 @@ const likeSong = async (req, res) => {
 
   const valid = await jwt.verify(token, process.env.JWT_SECRET);
   const userId = valid.id;
-   const user = await userSchema.findById(userId)
+  const user = await userSchema.findById(userId);
 
-   if(!user){
-   return res.status(404).json({
-      success:false,
-      message:"User not found"
-    })
-   }
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: "User not found",
+    });
+  }
 
-   const isSongAlredyLiked = user.likedSongs.some(
-    (likedSong)=>likedSong.songId.toString()===songId
-   )
+  const isSongAlredyLiked = user.likedSongs.some(
+    (likedSong) => likedSong.songId.toString() === songId
+  );
 
-   if(isSongAlredyLiked){
-   return res.status(400).json({
-      success:false,
-      message:"Song already liked"
-    })
-   }
-user.likedSongs.push({songId})
-await user.save()
-res.status(201).json({
-  success:true,
-  message:"Song added to favourite"
-})
+  if (isSongAlredyLiked) {
+    return res.status(400).json({
+      success: false,
+      message: "Song already liked",
+    });
+  }
+  user.likedSongs.push({ songId });
+  await user.save();
+  res.status(201).json({
+    success: true,
+    message: "Song added to favourite",
+  });
+};
 
+// view favourite songs
+
+const viewFavouriteSongs = async (req, res) => {
+  const { token } = req.cookies;
+  const valid = await jwt.verify(token, process.env.JWT_SECRET);
+  const userId = valid.id;
+
+  const user = await userSchema.findById(userId).populate({
+    path: "likedSongs.songId",
+    select: "name artist coverImage duration",
+  });
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: "User not found",
+    });
+  }
+  res.status(200).json({
+    success: true,
+    likedSongs: user.likedSongs.map((likedSong) => likedSong.songId),
+  });
+};
+
+// remove song from favorite
+
+const removeFavouriteSong = async (req, res) => {
+  const { token } = req.cookies;
+  const { songId } = req.params;
+  const valid = await jwt.verify(token, process.env.JWT_SECRET);
+  const userId = valid.id;
+  const user = await userSchema.findById(userId);
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: "User not found",
+    });
+  }
+
+  const updatedLikedSongs = user.likedSongs.filter(
+    (likedSong) => likedSong.songId.toString() !== songId
+  );
+  if (updatedLikedSongs.length === user.likedSongs.length) {
+    return res.status(404).json({
+      success: true,
+      message: "Song not found in favourites",
+    });
+  }
+  user.likedSongs = updatedLikedSongs;
+  await user.save();
+  res.status(200).json({
+    success: true,
+    message: "Song removed from playlist",
+  });
 };
 
 module.exports = {
@@ -170,5 +226,7 @@ module.exports = {
   searchSong,
   deleteSong,
   editSong,
-  likeSong
+  likeSong,
+  viewFavouriteSongs,
+  removeFavouriteSong
 };
