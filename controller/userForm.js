@@ -143,19 +143,16 @@ const googleLogin = async (req, res) => {
     });
     await user.save();
   }
- 
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '2h' });
 
-  
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: "2h",
+  });
 
   res.cookie("token", token, {
     httpOnly: true, // Makes cookie inaccessible via client-side JavaScript
-    secure: process.env.NODE_ENV === 'production', // Ensure this is true in production (HTTPS only)
+    secure: process.env.NODE_ENV === "production", // Ensure this is true in production (HTTPS only)
     sameSite: "None", // Necessary if you're making cross-site requests
   });
-  
-
- 
 
   res.status(200).json({
     userData: user,

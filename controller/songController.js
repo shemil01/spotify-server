@@ -84,11 +84,13 @@ const getSongById = async (req, res) => {
   const { songId } = req.params;
 
   const songData = await songSchema.findById({ _id: songId });
-  if (songData)
+  if (songData){
     return res.status(200).json({
       success: true,
       songData,
     });
+  }
+   
 };
 
 //Delete song
