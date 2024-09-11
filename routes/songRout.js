@@ -16,6 +16,7 @@ songRouter.post(
 // songRouter.post('/add-song',roleCheck(['artist', 'admin']),uploadFiles,tryCatch(controller.addSong))
 songRouter.get("/view-songs", userAuth, tryCatch(controller.getSongs));
 songRouter.get("/admin/songs", adminAuth, tryCatch(controller.getSongs));
+songRouter.post('/user/like-song/:songId',userAuth,tryCatch(controller.likeSong))
 songRouter.get("/song-by-id/:songId",userAuth,tryCatch(controller.getSongById));
 songRouter.get("/admin/songby-id/:songId",adminAuth,tryCatch(controller.getSongById));
 songRouter.delete('/admin/delete-song/:songId',adminAuth,tryCatch(controller.deleteSong))

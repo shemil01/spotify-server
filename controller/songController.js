@@ -1,6 +1,8 @@
 const songSchema = require("../model/SongSchema");
+const userSchema = require("../model/User");
 const cloudinary = require("cloudinary").v2;
 const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 
 //add song
 const addSong = async (req, res) => {
@@ -34,7 +36,7 @@ const addSong = async (req, res) => {
 const editSong = async (req, res) => {
   const { songId } = req.params;
   const { name, coverImage, fileUrl, artist, duration, description } = req.body;
-  console.log(req.body)
+  console.log(req.body);
 
   const song = await songSchema.findById(songId);
   if (!song) {
@@ -47,7 +49,7 @@ const editSong = async (req, res) => {
     { _id: songId },
     {
       name,
-      coverImage: req.cloudinaryImageUrl ,
+      coverImage: req.cloudinaryImageUrl,
       fileUrl: req.cloudinaryAudioUrl,
       artist,
       duration,
@@ -84,13 +86,12 @@ const getSongById = async (req, res) => {
   const { songId } = req.params;
 
   const songData = await songSchema.findById({ _id: songId });
-  if (songData){
+  if (songData) {
     return res.status(200).json({
       success: true,
       songData,
     });
   }
-   
 };
 
 //Delete song
@@ -126,6 +127,30 @@ const searchSong = async (req, res) => {
   });
 };
 
+// add to favourite
+
+const likeSong = async (req, res) => {
+  const { songId } = req.params;
+  const { token } = req.cookies;
+
+  const valid = await jwt.verify(token, process.env.JWT_SECRET);
+  const userId = valid.id;
+  const checkSong = await userSchema.findById(userId).populate("likedSongs");
+  if (checkSong) {
+    checkSong.likedSongs.push(songId);
+    await checkSong.save();
+    res.status(201).json({
+      success: true,
+      message: "Song added to favourite",
+    });
+  } else {
+    res.status(404).json({
+      success: true,
+      message: "User not found",
+    });
+  }
+};
+
 module.exports = {
   addSong,
   getSongs,
@@ -133,4 +158,5 @@ module.exports = {
   searchSong,
   deleteSong,
   editSong,
+  likeSong
 };
