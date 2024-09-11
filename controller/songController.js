@@ -169,10 +169,7 @@ const viewFavouriteSongs = async (req, res) => {
   const valid = await jwt.verify(token, process.env.JWT_SECRET);
   const userId = valid.id;
 
-  const user = await userSchema.findById(userId).populate({
-    path: "likedSongs.songId",
-    select: "name artist coverImage duration",
-  });
+  const user = await userSchema.findById(userId).populate('likedSongs');
 
   if (!user) {
     return res.status(404).json({
@@ -182,7 +179,7 @@ const viewFavouriteSongs = async (req, res) => {
   }
   res.status(200).json({
     success: true,
-    likedSongs: user.likedSongs.map((likedSong) => likedSong.songId),
+    likedSongs: user,
   });
 };
 

@@ -18,7 +18,7 @@ songRouter.get("/view-songs", userAuth, tryCatch(controller.getSongs));
 songRouter.get("/admin/songs", adminAuth, tryCatch(controller.getSongs));
 songRouter.post('/user/like-song/:songId',userAuth,tryCatch(controller.likeSong))
 songRouter.get('/user/view-likedsongs',userAuth,tryCatch(controller.viewFavouriteSongs))
-songRouter.delete('/user/remove-likedsong',userAuth,tryCatch(controller.removeFavouriteSong))
+songRouter.delete('/user/remove-likedsong/:songId',userAuth,tryCatch(controller.removeFavouriteSong))
 songRouter.get("/song-by-id/:songId",userAuth,tryCatch(controller.getSongById));
 songRouter.get("/admin/songby-id/:songId",adminAuth,tryCatch(controller.getSongById));
 songRouter.delete('/admin/delete-song/:songId',adminAuth,tryCatch(controller.deleteSong))
