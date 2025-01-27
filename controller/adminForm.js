@@ -15,7 +15,7 @@ const adminLogin = async (req, res) => {
   const admin = await Admin.findOne({ email });
   if (!admin) {
     return res.status(404).json({
-      success: false,
+        success: false,
       message: "Email is incorrect",
     });
   }
@@ -33,7 +33,7 @@ const adminLogin = async (req, res) => {
   res.cookie("adminToken", adminToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "none", // or 'lax' if you're using the same domain
+    sameSite: "none",
     maxAge: 24 * 60 * 60 * 1000, // 1 day
   });
 
@@ -58,5 +58,14 @@ const viewUsers = async (req, res) => {
     user,
   });
 };
+
+exports.banUser =async(req,res)=>{
+  const {userId} = req.params
+  const isExist = await User.findById(userId)
+  if(!isExist){
+    return res.status(400).send("User not exist")
+  }
+  
+}
 
 module.exports = { adminLogin, viewUsers };

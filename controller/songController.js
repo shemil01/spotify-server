@@ -123,7 +123,7 @@ const searchSong = async (req, res) => {
   res.status(200).json({
     success: true,
     song: results,
-    suggestions: suggestions,
+    suggestions: suggestions,    
   });
 };
 
